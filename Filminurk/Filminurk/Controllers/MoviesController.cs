@@ -1,8 +1,10 @@
-﻿using Filminurk.Core.Dto;
+﻿using Filminurk.Core.Domain;
+using Filminurk.Core.Dto;
 using Filminurk.Core.ServiceInterface;
 using Filminurk.Data;
 using Filminurk.Models.Movies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Filminurk.Controllers
 {
@@ -10,14 +12,17 @@ namespace Filminurk.Controllers
     {
         private readonly FilminurkTARpe24Context _context;
         private readonly IMovieServices _movieServices;
+        private readonly IFilesServices _filesServices; //piltide lisamiseks vajalik fileservices injection
         public MoviesController
             (
             FilminurkTARpe24Context context,
-            IMovieServices movieServices
+            IMovieServices movieServices,
+            IFilesServices filesServices //piltide lisamiseks vajalik fileservices injection
             )
         {
             _context = context;
             _movieServices = movieServices;
+            _filesServices = filesServices; //piltide lisamiseks vajalik fileservices injection
         }
         public IActionResult Index()
         {
@@ -56,7 +61,15 @@ namespace Filminurk.Controllers
                 Language = vm.Language,
                 DurationInMinutes = vm.DurationInMinutes,
                 EntryCreatedAt = vm.EntryCreatedAt,
-                EntryModifiedAt = vm.EntryModifiedAt
+                EntryModifiedAt = vm.EntryModifiedAt,
+                FileToApiDTOs = vm.Images
+                .Select(x => new FileToApiDTO 
+                { 
+                    ImageID = x.ImageID,
+                    FilePath = x.FilePath,
+                    MovieID = x.MovieID,
+                    IsPoster = x.IsPoster,
+                }).ToArray()
             };
             var result = await _movieServices.Create(dto);
             if (result == null) 
@@ -64,6 +77,118 @@ namespace Filminurk.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(Guid id) 
+        {
+            var movie = await _movieServices.DetailsAsync(id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            var images = await _context.FilesToApi
+                .Where(x => x.MovieID == id)
+                .Select(y => new ImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageID = id
+                }).ToArrayAsync();
+
+            var vm = new MoviesCreateUpdateViewModel();
+            vm.Id = movie.Id;
+            vm.Title = movie.Title;
+            vm.Description = movie.Description;
+            vm.FirstPublished = movie.FirstPublished;
+            vm.CurrentRating = movie.CurrentRating;
+            vm.Genre = movie.Genre;
+            vm.Language = movie.Language;
+            vm.DurationInMinutes = movie.DurationInMinutes;
+            vm.EntryCreatedAt = movie.EntryCreatedAt;
+            vm.EntryModifiedAt = movie.EntryModifiedAt;
+            vm.Director = movie.Director;
+            vm.Actors = movie.Actors;
+            vm.Images.AddRange(images);
+
+            return View("CreateUpdate", vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(MoviesCreateUpdateViewModel vm) 
+        {
+            var dto = new MoviesDTO()
+            {
+                Id = vm.Id,
+                Title = vm.Title,
+                Description = vm.Description,
+                FirstPublished = vm.FirstPublished,
+                CurrentRating = vm.CurrentRating,
+                Genre = vm.Genre,
+                Language = vm.Language,
+                DurationInMinutes = vm.DurationInMinutes,
+                EntryCreatedAt = vm.EntryCreatedAt,
+                EntryModifiedAt = vm.EntryModifiedAt,
+                Director = vm.Director,
+                Actors = vm.Actors,
+                Files = vm.Files,
+                FileToApiDTOs = vm.Images
+                .Select(x => new FileToApiDTO
+                { 
+                    ImageID = x.ImageID,
+                    MovieID = x.MovieID,
+                    FilePath = x.FilePath,
+                }).ToArray()
+            };
+            var result = await _movieServices.Update(dto);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id) 
+        {
+            var movie = await _movieServices.DetailsAsync(id);
+
+            if (movie = null)
+            {
+                return NotFound();
+            }
+
+            var images = await _context.FilesToApi
+                .Where(x => x.MovieID == id)
+                .Select(y => new ImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageID = id
+                }).ToArrayAsync();
+
+            var vm = new MoviesDeleteViewModel();
+            vm.Id = movie.Id;
+            vm.Title = movie.Title;
+            vm.Description = movie.Description;
+            vm.FirstPublished = movie.FirstPublished;
+            vm.CurrentRating = movie.CurrentRating;
+            vm.Genre = movie.Genre;
+            vm.Language = movie.Language;
+            vm.DurationInMinutes = movie.DurationInMinutes;
+            vm.EntryCreatedAt = movie.EntryCreatedAt;
+            vm.EntryModifiedAt = movie.EntryModifiedAt;
+            vm.Director = movie.Director;
+            vm.Actors = movie.Actors;
+            vm.Images.AddRange(images);
+
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmation(Guid id) 
+        { 
+            var movie awa
         }
     }
 }

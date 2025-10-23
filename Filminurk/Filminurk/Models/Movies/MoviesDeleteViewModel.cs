@@ -11,6 +11,9 @@
         public double? CurrentRating { get; set; }
         //public List<UserComment>? Reviews { get; set; }
 
+        /* Kassaasolevate piltide andmeomadused */
+        public List<ImageViewModel> Images { get; set; } = new List<ImageViewModel>();
+
         /* 3 õpilase valitud andmetüüpi */
         public string? Genre { get; set; }
         public string? Language { get; set; }

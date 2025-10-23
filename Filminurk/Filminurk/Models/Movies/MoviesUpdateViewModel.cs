@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
-namespace Filminurk.Core.Domain
+namespace Filminurk.Models.Movies
 {
-    public class Movie
+    public class MoviesUpdateViewModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -17,12 +13,16 @@ namespace Filminurk.Core.Domain
         public double? CurrentRating { get; set; }
         //public List<UserComment>? Reviews { get; set; }
 
+        /* Kassaasolevate piltide andmeomadused */
+        public List<IFormFile> Files { get; set; }
+        public List<ImageViewModel> Images { get; set; } = new List<ImageViewModel>();
+
         /* 3 õpilase valitud andmetüüpi */
         public string? Genre { get; set; }
         public string? Language { get; set; }
         public int? DurationInMinutes { get; set; }
 
-        /* andmebaasi jaoks vajalikud */
+        /* Andmebaasi jaoks vajalikud */
         public DateTime? EntryCreatedAt { get; set; }
         public DateTime? EntryModifiedAt { get; set; }
     }
