@@ -74,7 +74,11 @@ namespace Filminurk.Controllers
             var result = await _movieServices.Create(dto);
             if (result == null) 
             { 
-                return RedirectToAction(nameof(Index));
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return NotFound();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -151,11 +155,38 @@ namespace Filminurk.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var movie = await _movieServices.DetailsAsync(id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            var vm = new MoviesDetailsViewModel();
+
+            vm.Id = movie.Id;
+            vm.Title = movie.Title;
+            vm.Description = movie.Description;
+            vm.FirstPublished = movie.FirstPublished;
+            vm.CurrentRating = movie.CurrentRating;
+            vm.Genre = movie.Genre;
+            vm.Language = movie.Language;
+            vm.DurationInMinutes = movie.DurationInMinutes;
+            vm.EntryCreatedAt = movie.EntryCreatedAt;
+            vm.EntryModifiedAt = movie.EntryModifiedAt;
+            vm.Director = movie.Director;
+            vm.Actors = movie.Actors;
+
+            return View(vm);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Delete(Guid id) 
         {
             var movie = await _movieServices.DetailsAsync(id);
 
-            if (movie = null)
+            if (movie == null)
             {
                 return NotFound();
             }
@@ -186,9 +217,26 @@ namespace Filminurk.Controllers
             return View(vm);
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteConfirmation(Guid id) 
-        { 
-            var movie awa
+        public async Task<IActionResult> DeleteConfirmation(Guid id)
+        {
+            var movie = await _movieServices.Delete(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        private async Task<ImageViewModel[]> FileFromDatabase(Guid id)
+        {
+            return await _context.FilesToApi
+                .Where(x => x.MovieID == id)
+                .Select(y => new ImageViewModel 
+                { 
+                    ImageID = y.ImageID,
+                    MovieID = y.MovieID,
+                    IsPoster = y.IsPoster,
+                    FilePath = y.ExistingFilePath
+                }).ToArrayAsync();
         }
     }
 }

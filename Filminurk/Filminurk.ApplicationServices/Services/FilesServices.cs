@@ -22,11 +22,11 @@ namespace Filminurk.ApplicationServices.Services
             _context = context;
         }
 
-        public void FileToApi(MoviesDTO dto, MoviesDTO domain) 
+        public void FilesToApi(MoviesDTO dto, Movie domain)
         {
-            if (dto.Files != null && dto.Files.Count > 0) 
-            { 
-                if (!Directory.Exists(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\")) 
+            if (dto.Files != null && dto.Files.Count > 0)
+            {
+                if (!Directory.Exists(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\"))
                 {
                     Directory.CreateDirectory(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\");
                 }
@@ -37,17 +37,17 @@ namespace Filminurk.ApplicationServices.Services
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    using (var fileStream = new FileStream(filePath,FileMode.Create)) 
-                    { 
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
                         file.CopyTo(fileStream);
                         FileToApi path = new FileToApi
                         {
                             ImageID = Guid.NewGuid(),
                             ExistingFilePath = uniqueFileName,
-                            MovieID = domain.Id
+                            MovieID = domain.Id,
                         };
 
-                        _context.FilesToApi.AddAsync(path);
+                        _context.FilesToApi.Add(path);
                     }
                 }
             }
