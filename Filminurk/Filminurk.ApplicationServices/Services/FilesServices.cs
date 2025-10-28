@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Filminurk.Core.Domain;
+﻿using Filminurk.Core.Domain;
 using Filminurk.Core.Dto;
 using Filminurk.Core.ServiceInterface;
 using Filminurk.Data;
@@ -16,6 +11,7 @@ namespace Filminurk.ApplicationServices.Services
     {
         private readonly IHostEnvironment _webHost;
         private readonly FilminurkTARpe24Context _context;
+
         public FilesServices(IHostEnvironment webHost, FilminurkTARpe24Context context)
         {
             _webHost = webHost;
@@ -54,13 +50,13 @@ namespace Filminurk.ApplicationServices.Services
         }
 
         public async Task<FileToApi> RemoveImageFromApi(FileToApiDTO dto)
-        { 
+        {
             var imageID = await _context.FilesToApi.FirstOrDefaultAsync(x => x.ImageID == dto.ImageID);
 
             var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\" + imageID.ExistingFilePath;
 
-            if (File.Exists(filePath)) 
-            { 
+            if (File.Exists(filePath))
+            {
                 File.Delete(filePath);
             }
 
@@ -70,7 +66,7 @@ namespace Filminurk.ApplicationServices.Services
             return null;
         }
 
-        public async Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDTO[] dtos) 
+        public async Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDTO[] dtos)
         {
             foreach (var dto in dtos)
             {

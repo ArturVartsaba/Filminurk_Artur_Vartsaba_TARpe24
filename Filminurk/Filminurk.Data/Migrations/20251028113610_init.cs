@@ -6,13 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Filminurk.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init1 : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Moves",
+                name: "FilesToApi",
+                columns: table => new
+                {
+                    ImageID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExistingFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MovieID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsPoster = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilesToApi", x => x.ImageID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Movies",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -24,11 +38,13 @@ namespace Filminurk.Data.Migrations
                     CurrentRating = table.Column<double>(type: "float", nullable: true),
                     Genre = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DurationInMinutes = table.Column<int>(type: "int", nullable: true)
+                    DurationInMinutes = table.Column<int>(type: "int", nullable: true),
+                    EntryCreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EntryModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Moves", x => x.Id);
+                    table.PrimaryKey("PK_Movies", x => x.Id);
                 });
         }
 
@@ -36,7 +52,10 @@ namespace Filminurk.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Moves");
+                name: "FilesToApi");
+
+            migrationBuilder.DropTable(
+                name: "Movies");
         }
     }
 }

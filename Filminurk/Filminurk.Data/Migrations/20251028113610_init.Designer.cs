@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Filminurk.Data.Migrations
 {
     [DbContext(typeof(FilminurkTARpe24Context))]
-    [Migration("20251009090238_init1")]
-    partial class init1
+    [Migration("20251028113610_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,26 @@ namespace Filminurk.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Filminurk.Core.Domain.FileToApi", b =>
+                {
+                    b.Property<Guid>("ImageID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ExistingFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsPoster")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("MovieID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ImageID");
+
+                    b.ToTable("FilesToApi");
+                });
 
             modelBuilder.Entity("Filminurk.Core.Domain.Movie", b =>
                 {
@@ -48,6 +68,12 @@ namespace Filminurk.Data.Migrations
                     b.Property<int?>("DurationInMinutes")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("EntryCreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EntryModifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateOnly>("FirstPublished")
                         .HasColumnType("date");
 
@@ -63,7 +89,7 @@ namespace Filminurk.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Moves");
+                    b.ToTable("Movies");
                 });
 #pragma warning restore 612, 618
         }

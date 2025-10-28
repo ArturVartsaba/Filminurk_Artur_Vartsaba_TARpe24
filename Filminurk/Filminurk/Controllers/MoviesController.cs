@@ -42,49 +42,54 @@ namespace Filminurk.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            MoviesCreateViewModel result = new();
-            return View("Create", result);
+            MoviesCreateUpdateViewModel result = new();
+            return View("CreateUpdate", result);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(MoviesCreateViewModel vm) 
+        public async Task<IActionResult> Create(MoviesCreateUpdateViewModel vm)
         {
-            var dto = new MoviesDTO()
+            if (ModelState.IsValid)
             {
-                Id = vm.Id,
-                Title = vm.Title,
-                Description = vm.Description,
-                FirstPublished = vm.FirstPublished,
-                CurrentRating = vm.CurrentRating,
-                Director = vm.Director,
-                Actors = vm.Actors,
-                Genre = vm.Genre,
-                Language = vm.Language,
-                DurationInMinutes = vm.DurationInMinutes,
-                EntryCreatedAt = vm.EntryCreatedAt,
-                EntryModifiedAt = vm.EntryModifiedAt,
-                FileToApiDTOs = vm.Images
-                .Select(x => new FileToApiDTO 
-                { 
-                    ImageID = x.ImageID,
-                    FilePath = x.FilePath,
-                    MovieID = x.MovieID,
-                    IsPoster = x.IsPoster,
-                }).ToArray()
-            };
-            var result = await _movieServices.Create(dto);
-            if (result == null) 
-            { 
-                return NotFound();
-            }
-            if (!ModelState.IsValid)
-            {
-                return NotFound();
+                var dto = new MoviesDTO()
+                {
+                    Id = vm.Id,
+                    Title = vm.Title,
+                    Description = vm.Description,
+                    FirstPublished = vm.FirstPublished,
+                    CurrentRating = vm.CurrentRating,
+                    Director = vm.Director,
+                    Actors = vm.Actors,
+                    Genre = vm.Genre,
+                    Language = vm.Language,
+                    DurationInMinutes = vm.DurationInMinutes,
+                    EntryCreatedAt = vm.EntryCreatedAt,
+                    EntryModifiedAt = vm.EntryModifiedAt,
+                    Files = vm.Files,
+                    FileToApiDTOs = vm.Images
+                    .Select(x => new FileToApiDTO
+                    {
+                        ImageID = x.ImageID,
+                        FilePath = x.FilePath,
+                        MovieID = x.MovieID,
+                        IsPoster = x.IsPoster,
+                    }).ToArray()
+                };
+                var result = await _movieServices.Create(dto);
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                if (!ModelState.IsValid)
+                {
+                    return NotFound();
+                }
+                return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Update(Guid id) 
+        [HttpGet]
+        public async Task<IActionResult> Update(Guid id)
         {
             var movie = await _movieServices.DetailsAsync(id);
 
@@ -92,7 +97,6 @@ namespace Filminurk.Controllers
             {
                 return NotFound();
             }
-
             var images = await _context.FilesToApi
                 .Where(x => x.MovieID == id)
                 .Select(y => new ImageViewModel
@@ -120,7 +124,7 @@ namespace Filminurk.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(MoviesCreateUpdateViewModel vm) 
+        public async Task<IActionResult> Update(MoviesCreateUpdateViewModel vm)
         {
             var dto = new MoviesDTO()
             {
@@ -139,10 +143,10 @@ namespace Filminurk.Controllers
                 Files = vm.Files,
                 FileToApiDTOs = vm.Images
                 .Select(x => new FileToApiDTO
-                { 
+                {
                     ImageID = x.ImageID,
                     MovieID = x.MovieID,
-                    FilePath = x.FilePath,
+                    FilePath = x.FilePath
                 }).ToArray()
             };
             var result = await _movieServices.Update(dto);
@@ -230,8 +234,8 @@ namespace Filminurk.Controllers
         {
             return await _context.FilesToApi
                 .Where(x => x.MovieID == id)
-                .Select(y => new ImageViewModel 
-                { 
+                .Select(y => new ImageViewModel
+                {
                     ImageID = y.ImageID,
                     MovieID = y.MovieID,
                     IsPoster = y.IsPoster,

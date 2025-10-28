@@ -69,7 +69,14 @@
         </div>
     </dl>
 
-    <hr/>
+    <dl>
+        @foreach (var images in Model.Images)
+        {
+            <partial name="_Images" model="images" />
+        }
+    </dl>
+
+    <hr />
 
     <a asp-action="Index" asp-controller="Movies" class="btn btn-danger">Tagasi</a>
 </div>

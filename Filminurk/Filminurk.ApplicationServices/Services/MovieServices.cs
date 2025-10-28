@@ -73,7 +73,6 @@ namespace Filminurk.ApplicationServices.Services
 
             _context.Movies.Update(movie);
             await _context.SaveChangesAsync();
-
             return movie;
         }
 
