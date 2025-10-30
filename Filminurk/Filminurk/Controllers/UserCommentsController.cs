@@ -14,8 +14,8 @@ namespace Filminurk.Controllers
         public IActionResult Index()
         {
             var result = _context.UserComments
-                .Select (c => new UserCommentsIndexViewModel
-                { 
+                .Select(c => new UserCommentsIndexViewModel
+                {
                     CommentID = c.CommentID,
                     CommentBody = c.CommentBody,
                     IsHarmful = c.IsHarmful,

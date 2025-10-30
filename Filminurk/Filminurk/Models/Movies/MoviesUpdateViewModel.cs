@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
-
-namespace Filminurk.Models.Movies
+﻿namespace Filminurk.Models.Movies
 {
     public class MoviesUpdateViewModel
     {

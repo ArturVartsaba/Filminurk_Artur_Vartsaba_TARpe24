@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Filminurk.Core.Dto
 {
@@ -25,7 +20,7 @@ namespace Filminurk.Core.Dto
         public string? Genre { get; set; }
         public string? Language { get; set; }
         public int? DurationInMinutes { get; set; }
-        
+
         public DateTime? EntryCreatedAt { get; set; }
         public DateTime? EntryModifiedAt { get; set; }
     }
