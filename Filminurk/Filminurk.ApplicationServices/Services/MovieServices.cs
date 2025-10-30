@@ -3,11 +3,6 @@ using Filminurk.Core.Dto;
 using Filminurk.Core.ServiceInterface;
 using Filminurk.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Filminurk.ApplicationServices.Services
 {
@@ -20,8 +15,8 @@ namespace Filminurk.ApplicationServices.Services
             (
             FilminurkTARpe24Context context,
             IFilesServices fileServices  // failid          
-            ) 
-        { 
+            )
+        {
             _context = context;
             _filesServices = fileServices; // failid
         }
@@ -48,8 +43,8 @@ namespace Filminurk.ApplicationServices.Services
 
             return movie;
         }
-        public async Task<Movie> DetailsAsync(Guid id) 
-        { 
+        public async Task<Movie> DetailsAsync(Guid id)
+        {
             var result = await _context.Movies.FirstOrDefaultAsync(x => x.Id == id);
             return result;
         }

@@ -1,5 +1,4 @@
-﻿using Filminurk.Core.Domain;
-using Filminurk.Core.Dto;
+﻿using Filminurk.Core.Dto;
 using Filminurk.Core.ServiceInterface;
 using Filminurk.Data;
 using Filminurk.Models.Movies;
@@ -30,7 +29,7 @@ namespace Filminurk.Controllers
             {
                 Id = x.Id,
                 Title = x.Title,
-                FirstPublished = x.FirstPublished,
+                FirstPublished = (DateOnly)x.FirstPublished,
                 CurrentRating = x.CurrentRating,
                 Genre = x.Genre,
                 Language = x.Language,
@@ -109,7 +108,7 @@ namespace Filminurk.Controllers
             vm.Id = movie.Id;
             vm.Title = movie.Title;
             vm.Description = movie.Description;
-            vm.FirstPublished = movie.FirstPublished;
+            vm.FirstPublished = (DateOnly)movie.FirstPublished;
             vm.CurrentRating = movie.CurrentRating;
             vm.Genre = movie.Genre;
             vm.Language = movie.Language;
@@ -167,6 +166,8 @@ namespace Filminurk.Controllers
             {
                 return NotFound();
             }
+            ImageViewModel[] images = await FileFromDatabase(id);
+
             var vm = new MoviesDetailsViewModel();
 
             vm.Id = movie.Id;
@@ -181,12 +182,13 @@ namespace Filminurk.Controllers
             vm.EntryModifiedAt = movie.EntryModifiedAt;
             vm.Director = movie.Director;
             vm.Actors = movie.Actors;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(Guid id) 
+        public async Task<IActionResult> Delete(Guid id)
         {
             var movie = await _movieServices.DetailsAsync(id);
 

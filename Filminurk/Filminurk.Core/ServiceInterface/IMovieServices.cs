@@ -8,7 +8,7 @@ using Filminurk.Core.Dto;
 
 namespace Filminurk.Core.ServiceInterface
 {
-    public interface IMovieServices
+    public interface IMovieServices // see on interface. asub .Core/ServiceInterface
     {
         Task<Movie> Create(MoviesDTO dto);
         Task<Movie> Delete(Guid id);

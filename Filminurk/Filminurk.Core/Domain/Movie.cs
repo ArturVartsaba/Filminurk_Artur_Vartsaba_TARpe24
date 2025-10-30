@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Filminurk.Core.Domain
+﻿namespace Filminurk.Core.Domain
 {
     public class Movie
     {
@@ -15,7 +9,7 @@ namespace Filminurk.Core.Domain
         public string Director { get; set; }
         public List<string>? Actors { get; set; }
         public double? CurrentRating { get; set; }
-        //public List<UserComment>? Reviews { get; set; }
+        public List<UserComment>? Reviews { get; set; }
 
         /* 3 õpilase valitud andmetüüpi */
         public string? Genre { get; set; }
