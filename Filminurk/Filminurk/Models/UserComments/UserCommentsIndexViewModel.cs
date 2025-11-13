@@ -16,5 +16,6 @@ namespace Filminurk.Models.UserComments
         public DateTime CommentCreatedAt { get; set; }
         public DateTime? CommentModifiedAt { get; set; }
         public DateTime? CommentDeletedAt { get; set; }
+        public object CommentedCreatedAt { get; internal set; }
     }
 }
