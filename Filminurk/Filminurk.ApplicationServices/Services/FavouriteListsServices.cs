@@ -1,0 +1,47 @@
+﻿using Filminurk.Core.Domain;
+using Filminurk.Core.Dto;
+using Filminurk.Core.ServiceInterface;
+using Filminurk.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Filminurk.ApplicationServices.Services
+{
+    public class FavouriteListsServices : IFavouriteListsServices
+    {
+        private readonly FilminurkTARpe24Context _context;
+        private readonly IFilesServices _fileService;
+
+        public FavouriteListsServices(FilminurkTARpe24Context context, IFilesServices fileService)
+        {
+            _context = context;
+            _fileService = fileService;
+        }
+
+        public async Task<FavouriteList> DetailsAsync(Guid id)
+        {
+            var result = await _context.FavouriteLists
+                .FirstOrDefaultAsync(x => x.FavouriteListID == id);
+            return result;
+        }
+
+        public async Task<FavouriteList> Create(FavouriteListDTO dto, List<Movie> selectedMovies) 
+        {
+            FavouriteList newList = new();
+            newList.FavouriteListID = Guid.NewGuid();
+            newList.ListName = dto.ListName;
+            newList.ListDescription = dto.ListDescription;
+            newList.ListCreatedAt = dto.ListCreatedAt;
+            newList.ListModifiedAt = dto.ListModifiedAt;
+            newList.ListDeletedAt = dto.ListDeletedAt;
+            //newList.ListOfMovies = selectedMovies;
+            await _context.FavouriteLists.AddAsync(newList);
+            await _context.SaveChangesAsync();
+
+            //foreach(var movieid in selectedMovies) 
+            //{
+            //    _context.FavouriteLists.Entry();
+            //}
+            return newList;
+        }
+    }
+}
