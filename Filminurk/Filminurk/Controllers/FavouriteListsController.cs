@@ -86,18 +86,89 @@ namespace Filminurk.Controllers
             newListDto.ListModifiedAt = DateTime.UtcNow;
             newListDto.ListDeletedAt = vm.ListDeletedAt;
 
+            var listofmoviestoadd = new List<Movie>();
+            foreach (var movieId in tempParse)
+            {
+                Movie thismovie = (Movie)_context.Movies.Where(m => m.Id == movieId).ToList().First();
+                listofmoviestoadd.Add(thismovie);
+
+            }
+            newListDto.ListOfMovies = listofmoviestoadd;
+
             List<Guid> convertedIDs = new List<Guid>();
             if (newListDto.ListOfMovies != null)
             {
                 convertedIDs = MovieToId(newListDto.ListOfMovies);
             }
-            var newList = await _FavouriteListsServices.Create(newListDto,
-                convertedIDs);
-            if (newList != null)
+            var newList = await _FavouriteListsServices.Create(newListDto /*, convertedIDs*/);
+            if (newList == null)
             {
                 return BadRequest();
             }
             return RedirectToAction("Index", vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UserDetails(Guid id, Guid thisuserid)
+        {
+            if (id == null || thisuserid == null) 
+            {
+                return BadRequest();
+                //TODO: return corresponding errorviews. id not found for list, and user login error for userid
+            }
+            var thisList = _context.FavouriteLists
+                .Where(tl => tl.FavouriteListID == id && tl.ListBelongsToUser == thisuserid.ToString())
+                .Select(
+                stl => new FavouriteListsUserDetailsViewModel
+                {
+                    FavouriteListID = stl.FavouriteListID,
+                    ListBelongsToUser = stl.ListBelongsToUser,
+                    IsMovieOrActor = stl.IsMovieOrActor,
+                    ListName = stl.ListName,
+                    ListDescription = stl.ListDescription,
+                    IsPrivate = stl.IsPrivate,
+                    ListOfMovies = stl.ListOfMovies,
+                    IsReported = stl.IsReported,
+                    //Image = _context.FilesToDatabase
+                    //.Where(i => i.ListID == stl.FavouriteListID)
+                    //.Select(si => new FavouriteListsIndexImageViewModel
+                    //{
+                    //    ImageID = si.ImageID,
+                    //    ListID = si.ListID,
+                    //    ImageData = si.ImageData,
+                    //    ImageTitle = si.ImageTitle,
+                    //    Image = string.Format("data:image/gif;base64,{0}", Convert.ToBase64String(si.ImageData))
+                    //}).ToList()
+                }).First();
+            //add viewdata attribute here later, to discern between user and admin
+            if (thisList == null) 
+            { 
+                return NotFound();
+            }
+            return View("Details", thisList);
+        }
+
+        [HttpPost]
+        public IActionResult UserTogglePrivacy(Guid id) 
+        { 
+            FavouriteList thisList = _FavouriteListsServices.DetailsAsync(id);
+
+            FavouriteListDTO updatedList = new FavouriteListDTO();
+            updatedList.FavouriteListID = thisList.FavouriteListID;
+            updatedList.ListBelongsToUser = thisList.ListBelongsToUser;
+            updatedList.ListName = thisList.ListName;
+            updatedList.ListDescription = thisList.ListDescription;
+            updatedList.IsPrivate = thisList.IsPrivate;
+            updatedList.ListOfMovies = thisList.ListOfMovies;
+            updatedList.IsReported = thisList.IsReported;
+            updatedList.IsMovieOrActor = thisList.IsMovieOrActor;
+            updatedList.ListCreatedAt = thisList.ListCreatedAt;
+            updatedList.ListModifiedAt = DateTime.UtcNow;
+            updatedList.ListDeletedAt = thisList.ListDeletedAt;
+            
+            thisList.IsPrivate = !thisList.IsPrivate;
+            _FavouriteListsServices.Update(thisList);
+            return View("Details");
         }
 
         private List<Guid> MovieToId(List<Movie> listOfMovies)
