@@ -1,10 +1,8 @@
-﻿using AspNetCoreGeneratedDocument;
-using Filminurk.Core.Dto;
+﻿using Filminurk.Core.Dto;
 using Filminurk.Core.ServiceInterface;
 using Filminurk.Data;
 using Filminurk.Models.UserComments;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.JSInterop.Infrastructure;
 
 namespace Filminurk.Controllers
 {
@@ -95,7 +93,7 @@ namespace Filminurk.Controllers
 
         }
         [HttpGet]
-        public async Task<IActionResult> DeleteComment(Guid id) 
+        public async Task<IActionResult> DeleteComment(Guid id)
         {
             var deleteEntry = await _userCommentsServices.DetailAsync(id);
 
@@ -112,8 +110,8 @@ namespace Filminurk.Controllers
             return View("DeleteAdmin", commentVM);
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteAdminPost(Guid id) 
-        { 
+        public async Task<IActionResult> DeleteAdminPost(Guid id)
+        {
             var deleteThisComment = await _userCommentsServices.Delete(id);
             if (deleteThisComment == null) { return NotFound(); }
             return RedirectToAction("Index");

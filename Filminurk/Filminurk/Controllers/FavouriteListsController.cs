@@ -30,6 +30,7 @@ namespace Filminurk.Controllers
                     ListName = x.ListName,
                     ListDescription = x.ListDescription,
                     ListCreatedAt = x.ListCreatedAt,
+                    ListDeletedAt = (DateTime)x.ListDeletedAt,
                     Image = (List<FavouriteListsIndexImageViewModel>)_context.FilesToDatabase
                         .Where(ml => ml.ListID == x.FavouriteListID)
                         .Select(li => new FavouriteListsIndexImageViewModel
@@ -47,7 +48,7 @@ namespace Filminurk.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult UserCreate()
         {
             var movies = _context.Movies
                 .OrderBy(m => m.Title)
@@ -111,7 +112,7 @@ namespace Filminurk.Controllers
         [HttpGet]
         public async Task<IActionResult> UserDetails(Guid id, Guid thisuserid)
         {
-            if (id == null || thisuserid == null) 
+            if (id == null || thisuserid == null)
             {
                 return BadRequest();
                 //TODO: return corresponding errorviews. id not found for list, and user login error for userid
@@ -141,17 +142,17 @@ namespace Filminurk.Controllers
                     //}).ToList()
                 }).First();
             //add viewdata attribute here later, to discern between user and admin
-            if (thisList == null) 
-            { 
+            if (thisList == null)
+            {
                 return NotFound();
             }
             return View("Details", thisList);
         }
 
         [HttpPost]
-        public IActionResult UserTogglePrivacy(Guid id) 
-        { 
-            FavouriteList thisList = _FavouriteListsServices.DetailsAsync(id);
+        public async Task<IActionResult> UserTogglePrivacy(Guid id)
+        {
+            FavouriteList thisList = await _FavouriteListsServices.DetailsAsync(id);
 
             FavouriteListDTO updatedList = new FavouriteListDTO();
             updatedList.FavouriteListID = thisList.FavouriteListID;
@@ -165,10 +166,45 @@ namespace Filminurk.Controllers
             updatedList.ListCreatedAt = thisList.ListCreatedAt;
             updatedList.ListModifiedAt = DateTime.UtcNow;
             updatedList.ListDeletedAt = thisList.ListDeletedAt;
+            ViewData["UpdateServiceType"] = "Private";
+
+            thisList.IsPrivate = !updatedList.IsPrivate;
+
+            var result = await _FavouriteListsServices.Update(updatedList, "Private");
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> UserDelete(Guid id) 
+        { 
+            var deletedList = await _FavouriteListsServices.DetailsAsync(id);
+            deletedList.ListDeletedAt = DateTime.Now;
+
+            var dto = new FavouriteListDTO();
+            dto.FavouriteListID = deletedList.FavouriteListID;
+            dto.ListBelongsToUser = deletedList.ListBelongsToUser;
+            dto.ListName = deletedList.ListName;
+            dto.ListDescription = deletedList.ListDescription;
+            dto.IsPrivate = deletedList.IsPrivate;
+            dto.ListOfMovies = deletedList.ListOfMovies;
+            dto.IsReported = deletedList.IsReported;
+            dto.IsMovieOrActor = deletedList.IsMovieOrActor;
+            dto.ListCreatedAt = deletedList.ListCreatedAt;
+            dto.ListModifiedAt = DateTime.Now;
+            dto.ListDeletedAt = deletedList.ListDeletedAt;
+            ViewData["UpdateServiceType"] = "Delete";
             
-            thisList.IsPrivate = !thisList.IsPrivate;
-            _FavouriteListsServices.Update(thisList);
-            return View("Details");
+            var result = await _FavouriteListsServices.Update(dto, "Delete");
+            if (result == null) 
+            { 
+                NotFound();
+            }
+
+            return RedirectToAction("Index");
         }
 
         private List<Guid> MovieToId(List<Movie> listOfMovies)

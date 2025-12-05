@@ -13,7 +13,7 @@ namespace Filminurk.ApplicationServices.Services
             _context = context;
         }
         public async Task<Actor> Create(ActorDTO dto)
-        { 
+        {
             Actor actor = new Actor();
             actor.ActorID = Guid.NewGuid();
             actor.FirstName = dto.FirstName;

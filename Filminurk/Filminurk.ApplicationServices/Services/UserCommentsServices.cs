@@ -39,8 +39,8 @@ namespace Filminurk.ApplicationServices.Services
                 .FirstOrDefaultAsync(x => x.CommentID == id);
             return returnComment;
         }
-        public async Task<UserComment> Delete(Guid id) 
-        { 
+        public async Task<UserComment> Delete(Guid id)
+        {
             var result = await _context.UserComments
                 .FirstOrDefaultAsync(x => x.CommentID == id);
             if (result != null)
