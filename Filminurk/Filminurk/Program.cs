@@ -14,7 +14,7 @@ builder.Services.AddScoped<IActorServices, ActorServices>();
 builder.Services.AddScoped<IFilesServices, FilesServices>();
 builder.Services.AddScoped<IUserCommentsServices, UserCommentsServices>();
 builder.Services.AddScoped<IFavouriteListsServices, FavouriteListsServices>();
-builder.Services.AddScoped<IAccountServices, AccountsServices>();
+builder.Services.AddScoped<IAccountsServices, AccountsServices>();
 builder.Services.AddDbContext<FilminurkTARpe24Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IEmailsServices, EmailsServices>();
 

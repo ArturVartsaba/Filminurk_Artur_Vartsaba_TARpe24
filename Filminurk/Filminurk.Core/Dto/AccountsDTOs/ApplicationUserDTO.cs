@@ -14,7 +14,7 @@ namespace Filminurk.Core.Dto.AccountsDTOs
         public bool ProfileType { get; set; } // True - Admin, False - User
         public List<Guid>? FavouriteListIDs { get; set; }
         public List<Guid>? CommentIDs { get; set; }
-        public string AvatarImageID? { get; set; }
+        public string? AvatarImageID { get; set; }
         public string DisplayName { get; set; }
 
         /* 2 õpilase poolt väljamõeldud andmevälja */
