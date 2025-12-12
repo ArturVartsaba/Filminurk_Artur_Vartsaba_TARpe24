@@ -27,11 +27,11 @@ namespace Filminurk.ApplicationServices.Services
             _signInManager = signInManager;
             _emailsServices = emailsServices;
         }
-        public async Task<IApplicationUser> Register(ApplicationUserDTO userDTO)
+        public async Task<ApplicationUser> Register(ApplicationUserDTO userDTO)
         {
             var user = new ApplicationUser
             {
-                UserName = userDTO.UserName,
+                UserName = userDTO.Email,
                 Email = userDTO.Email,
                 ProfileType = userDTO.ProfileType,
                 DisplayName = userDTO.DisplayName,
@@ -41,6 +41,11 @@ namespace Filminurk.ApplicationServices.Services
             { 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             }
+            return user;
+        }
+        public async Task<ApplicationUser> Login(LoginDTO userDTO) 
+        {
+            var user = await _userManager.FindByEmailAsync(userDTO.Email);
             return user;
         }
     }
