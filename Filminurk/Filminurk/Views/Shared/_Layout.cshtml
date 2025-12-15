@@ -39,16 +39,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Emails" asp-action="Index">Saada email</a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Chat" asp-action="Index">chat</a>
-                        </li>
                     </ul>
                     <ul>
                         @if (signInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="FavouriteLists" asp-action="Index">Minu Lemmikute nimekirjad</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Chat" asp-action="Index">chat</a>
                             </li>
                             <li class="nav-item">
                                 <form method="post" asp-controller="Accounts" asp-action="Logout">
