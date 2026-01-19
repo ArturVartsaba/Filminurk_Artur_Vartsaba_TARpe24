@@ -5,7 +5,6 @@ using Filminurk.Models.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Filminurk.Controllers
 {
     public class AccountsController : Controller
@@ -14,16 +13,19 @@ namespace Filminurk.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly FilminurkTARpe24Context _context;
         private readonly IEmailsServices _emailsServices;
+        IEmailsServices emailsServices;
         
         public AccountsController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            FilminurkTARpe24Context context
+            FilminurkTARpe24Context context,
+            IEmailsServices emailsServices
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _emailsServices = emailsServices;
         }
         [HttpGet]
         public async Task<IActionResult> AddPassword()
@@ -196,7 +198,19 @@ namespace Filminurk.Controllers
                     //kinnituslingiga, mille jaoks kasutatakse tokenit. siin tuleb kutsuda vastav, uus, emaili saatmise meetod, mis saadab
                     //õige sisuga kirja
                 }
-
+                
+                emailsServices.SendRegistrationEmail(
+                    new Core.Dto.EmailDTO()
+                    {
+                        SendToThisAddress = user.Email,
+                        EmailSubject = "Konto loomine",
+                        EmailContent = $"{"Sinu konto on edukalt loodud"}"
+                    },
+                    new Core.Dto.EmailTokenDTO()
+                    {
+                        Token = null
+                    }
+                );
                 return RedirectToAction("Index", "Home");
             }
             return BadRequest();
@@ -224,7 +238,7 @@ namespace Filminurk.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string? returnURL) 
+        public async Task<IActionResult> Login(string? returnURL)
         {
             LoginViewModel vm = new()
             {
@@ -238,12 +252,12 @@ namespace Filminurk.Controllers
         {
             if (ModelState.IsValid) 
             { 
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user != null || !user.EmailConfirmed && (await _userManager.CheckPasswordAsync(user, model.Password))) 
-                {
-                    ModelState.AddModelError("", "Sinu email ei ole kinnitatud, palun vaata spämmikausta.");
-                    return View(model);
-                }
+                //var user = await _userManager.FindByEmailAsync(model.Email);
+                //if (user != null || !user.EmailConfirmed && (await _userManager.CheckPasswordAsync(user, model.Password))) 
+                //{
+                //    ModelState.AddModelError("", "Sinu email ei ole kinnitatud, palun vaata spämmikausta.");
+                //    return View(model);
+                //}
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
                 if (result.Succeeded) 
                 { 
